@@ -56,6 +56,7 @@ class DetCon: public G4VUserDetectorConstruction
 	G4double m_SciX, m_SciY, m_SciZ;
 	G4double m_PMTD, m_PMTT;
 	G4double m_GapD;
+	G4int m_PMT1, m_PMT2;
 
 	// Geometry objects: World
 	G4Box* m_WorldSolid;

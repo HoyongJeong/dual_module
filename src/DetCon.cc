@@ -50,6 +50,8 @@ void DetCon::DefineDimensions()
 	// PMT dimensions
 	m_PMTD =   52. * mm; // PMT diameter
 	m_PMTT =  100. * mm; // PMT length
+	m_PMT1 = -1; // PMT1 direction. +1: forward, -1: backward
+	m_PMT2 = +1; // PMT2 direction. +1: forward, -1: backward
 
 	// Gap btw modules
 	m_GapD =  800. * mm;
@@ -76,7 +78,7 @@ G4VPhysicalVolume* DetCon::Construct()
 	// Scintillator1
 	m_Sci1Solid1 = new G4Box("Sci1Solid1", m_SciX / 2., m_SciY / 2., m_SciZ / 2.);
 	m_Sci1Solid2 = new G4Tubs("Sci1Solid2", 0., m_PMTD / 2., m_PMTT / 2., 0. * degree, 360. * degree);
-	m_Sci1Solid = new G4UnionSolid("Sci1Solid", m_Sci1Solid1, m_Sci1Solid2, 0, G4ThreeVector(0., 0., - m_SciZ / 2. - m_PMTT / 2.));
+	m_Sci1Solid = new G4UnionSolid("Sci1Solid", m_Sci1Solid1, m_Sci1Solid2, 0, G4ThreeVector(0., 0., m_SciZ/2. * m_PMT1 + m_PMTT/2. * m_PMT2));
 	m_Sci1LV = new G4LogicalVolume(m_Sci1Solid, m_SciMat, "Sci1LV");
 	m_Sci1LV -> SetVisAttributes(new G4VisAttributes(G4Colour::White()));
 	m_Sci1PV = new G4PVPlacement(0, G4ThreeVector(0., 0., - m_SciZ / 2. - m_GapD / 2.), "Sci1PV", m_Sci1LV, m_LabPV, false, 0);
@@ -85,21 +87,21 @@ G4VPhysicalVolume* DetCon::Construct()
 	m_PMT1Solid = new G4Tubs("PMT1Solid", 0., m_PMTD / 2., m_PMTT / 2., 0. * degree, 360. * degree);
 	m_PMT1LV = new G4LogicalVolume(m_PMT1Solid, m_PMTMat, "PMT1LV");
 	m_PMT1LV -> SetVisAttributes(new G4VisAttributes(G4Colour::Gray()));
-	m_PMT1PV = new G4PVPlacement(0, G4ThreeVector(0., 0., - m_SciZ / 2. - m_PMTT / 2.), m_PMT1LV, "PMT1PV", m_Sci1LV, false, 0);
+	m_PMT1PV = new G4PVPlacement(0, G4ThreeVector(0., 0., m_SciZ/2. * m_PMT1 + m_PMTT/2. * m_PMT1), m_PMT1LV, "PMT1PV", m_Sci1LV, false, 0);
 
 	// Scintillator2
 	m_Sci2Solid1 = new G4Box("Sci2Solid1", m_SciX / 2., m_SciY / 2., m_SciZ / 2.);
 	m_Sci2Solid2 = new G4Tubs("Sci2Solid2", 0., m_PMTD / 2., m_PMTT / 2., 0. * degree, 360. * degree);
-	m_Sci2Solid = new G4UnionSolid("Sci2Solid", m_Sci2Solid1, m_Sci2Solid2, 0, G4ThreeVector(0., 0., m_SciZ / 2. + m_PMTT / 2.));
+	m_Sci2Solid = new G4UnionSolid("Sci2Solid", m_Sci2Solid1, m_Sci2Solid2, 0, G4ThreeVector(0., 0., m_SciZ/2. * m_PMT2 + m_PMTT/2. * m_PMT2));
 	m_Sci2LV = new G4LogicalVolume(m_Sci2Solid, m_SciMat, "Sci2LV");
 	m_Sci2LV -> SetVisAttributes(new G4VisAttributes(G4Colour::White()));
-	m_Sci2PV = new G4PVPlacement(0, G4ThreeVector(0., 0., + m_SciZ / 2. + m_GapD / 2.), "Sci2PV", m_Sci2LV, m_LabPV, false, 0);
+	m_Sci2PV = new G4PVPlacement(0, G4ThreeVector(0., 0., + m_SciZ / 2.+ m_GapD / 2.), "Sci2PV", m_Sci2LV, m_LabPV, false, 0);
 
 	// PMT2
 	m_PMT2Solid = new G4Tubs("PMT2Solid", 0., m_PMTD / 2., m_PMTT / 2., 0. * degree, 360. * degree);
 	m_PMT2LV = new G4LogicalVolume(m_PMT2Solid, m_PMTMat, "PMT2LV");
 	m_PMT2LV -> SetVisAttributes(new G4VisAttributes(G4Colour::Gray()));
-	m_PMT2PV = new G4PVPlacement(0, G4ThreeVector(0., 0., + m_SciZ / 2. + m_PMTT / 2.), m_PMT2LV, "PMT2PV", m_Sci2LV, false, 0);
+	m_PMT2PV = new G4PVPlacement(0, G4ThreeVector(0., 0., m_SciZ/2. * m_PMT2 + m_PMTT/2. * m_PMT2), m_PMT2LV, "PMT2PV", m_Sci2LV, false, 0);
 
 
 	//------------------------------------------------

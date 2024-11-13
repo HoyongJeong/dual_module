@@ -78,10 +78,10 @@ G4VPhysicalVolume* DetCon::Construct()
 	// Scintillator1
 	m_Sci1Solid1 = new G4Box("Sci1Solid1", m_SciX / 2., m_SciY / 2., m_SciZ / 2.);
 	m_Sci1Solid2 = new G4Tubs("Sci1Solid2", 0., m_PMTD / 2., m_PMTT / 2., 0. * degree, 360. * degree);
-	m_Sci1Solid = new G4UnionSolid("Sci1Solid", m_Sci1Solid1, m_Sci1Solid2, 0, G4ThreeVector(0., 0., m_SciZ/2. * m_PMT1 + m_PMTT/2. * m_PMT2));
+	m_Sci1Solid = new G4UnionSolid("Sci1Solid", m_Sci1Solid1, m_Sci1Solid2, 0, G4ThreeVector(0., 0., m_SciZ/2. * m_PMT1 + m_PMTT/2. * m_PMT1));
 	m_Sci1LV = new G4LogicalVolume(m_Sci1Solid, m_SciMat, "Sci1LV");
 	m_Sci1LV -> SetVisAttributes(new G4VisAttributes(G4Colour::White()));
-	m_Sci1PV = new G4PVPlacement(0, G4ThreeVector(0., 0., - m_SciZ / 2. - m_GapD / 2.), "Sci1PV", m_Sci1LV, m_LabPV, false, 0);
+	m_Sci1PV = new G4PVPlacement(0, G4ThreeVector(0., 0., - m_SciZ / 2. - m_GapD / 2.), m_Sci1LV, "Sci1PV", m_LabLV, false, 0);
 
 	// PMT1
 	m_PMT1Solid = new G4Tubs("PMT1Solid", 0., m_PMTD / 2., m_PMTT / 2., 0. * degree, 360. * degree);
@@ -95,7 +95,7 @@ G4VPhysicalVolume* DetCon::Construct()
 	m_Sci2Solid = new G4UnionSolid("Sci2Solid", m_Sci2Solid1, m_Sci2Solid2, 0, G4ThreeVector(0., 0., m_SciZ/2. * m_PMT2 + m_PMTT/2. * m_PMT2));
 	m_Sci2LV = new G4LogicalVolume(m_Sci2Solid, m_SciMat, "Sci2LV");
 	m_Sci2LV -> SetVisAttributes(new G4VisAttributes(G4Colour::White()));
-	m_Sci2PV = new G4PVPlacement(0, G4ThreeVector(0., 0., + m_SciZ / 2.+ m_GapD / 2.), "Sci2PV", m_Sci2LV, m_LabPV, false, 0);
+	m_Sci2PV = new G4PVPlacement(0, G4ThreeVector(0., 0., + m_SciZ / 2.+ m_GapD / 2.), m_Sci2LV, "Sci2PV", m_LabLV, false, 0);
 
 	// PMT2
 	m_PMT2Solid = new G4Tubs("PMT2Solid", 0., m_PMTD / 2., m_PMTT / 2., 0. * degree, 360. * degree);
@@ -107,51 +107,19 @@ G4VPhysicalVolume* DetCon::Construct()
 	//------------------------------------------------
 	//   Surfaces
 	//------------------------------------------------
-	// Scintillator1
-	m_Sci1OpS = new G4OpticalSurface("Sci1OpS");
-	m_Sci1OpS -> SetType(dielectric_LUTDAVIS);
-	m_Sci1OpS -> SetFinish(RoughTeflon_LUT); // Surface property
-	m_Sci1OpS -> SetModel(DAVIS);
+	m_SciOpS = new G4OpticalSurface("SciOpS");
+	m_SciOpS -> SetType(dielectric_LUTDAVIS);
+	m_SciOpS -> SetFinish(RoughTeflon_LUT); // Surface property
+	m_SciOpS -> SetModel(DAVIS);
 
-	m_Sci1LBS = new G4LogicalBorderSurface("Sci1LBS", m_Sci1PV, m_LabPV, m_Sci1OpS);
+	m_Sci1LBS = new G4LogicalBorderSurface("Sci1LBS", m_Sci1PV, m_LabPV, m_SciOpS);
+	m_Sci2LBS = new G4LogicalBorderSurface("Sci2LBS", m_Sci2PV, m_LabPV, m_SciOpS);
 
-	G4OpticalSurface* opS1 = dynamic_cast<G4OpticalSurface*>(m_Sci1LBS -> GetSurface(m_Sci1PV, m_LabPV) -> GetSurfaceProperty());
-	if ( opS1 ) opS1 -> DumpInfo();
-
-	// Scintillator2
-	m_Sci2OpS = new G4OpticalSurface("Sci2OpS");
-	m_Sci2OpS -> SetType(dielectric_LUTDAVIS);
-	m_Sci2OpS -> SetFinish(RoughTeflon_LUT); // Surface property
-	m_Sci2OpS -> SetModel(DAVIS);
-
-	m_Sci2LBS = new G4LogicalBorderSurface("Sci2LBS", m_Sci2PV, m_LabPV, m_Sci2OpS);
-
-	G4OpticalSurface* opS2 = dynamic_cast<G4OpticalSurface*>(m_Sci2LBS -> GetSurface(m_Sci2PV, m_LabPV) -> GetSurfaceProperty());
-	if ( opS2 ) opS2 -> DumpInfo();
-
-
-	// Air
-	m_AirOpS = new G4OpticalSurface("AirOpS");
-	m_AirOpS -> SetType(dielectric_dielectric);
-	m_AirOpS -> SetFinish(polished);
-	m_AirOpS -> SetModel(glisur);
-
-	// Generate & Add Material Properties Table attached to the optical surfaces
-	std::vector<G4double> ephoton = { 2.034 * eV, 4.136 * eV };
-
-	// OpticalAirSurface
-	std::vector<G4double> reflectivity = { 0.3, 0.5 };
-	std::vector<G4double> efficiency   = { 0.8, 1.0 };
-
-	m_AirST = new G4MaterialPropertiesTable();
-
-	m_AirST -> AddProperty("REFLECTIVITY", ephoton, reflectivity);
-	m_AirST -> AddProperty("EFFICIENCY", ephoton, efficiency);
-
-	G4cout << "Air Surface G4MaterialPropertiesTable:" << G4endl;
-	m_AirST -> DumpTable();
-
-	m_AirOpS -> SetMaterialPropertiesTable(m_AirST);
+	G4OpticalSurface* opS;
+	opS = dynamic_cast<G4OpticalSurface*>(m_Sci1LBS -> GetSurface(m_Sci1PV, m_LabPV) -> GetSurfaceProperty());
+	if ( opS ) opS -> DumpInfo();
+	opS = dynamic_cast<G4OpticalSurface*>(m_Sci2LBS -> GetSurface(m_Sci2PV, m_LabPV) -> GetSurfaceProperty());
+	if ( opS ) opS -> DumpInfo();
 
 
 	return m_LabPV;
@@ -249,7 +217,7 @@ void DetCon::ConstructMaterials()
 		G4ExceptionDescription ed;
 		ed << "Error calculating group velocities. Incorrect number of entries "
 		      "in group velocity material property vector.";
-		G4Exception("mCP::DetCon", "mCP001", FatalException, ed);
+		G4Exception("dual_module::DetCon", "dual_module_001", FatalException, ed);
 	}
 
 	// Adding a property from two std::vectors. Argument createNewKey is false and spline is true.
@@ -260,7 +228,7 @@ void DetCon::ConstructMaterials()
 	// Arguments spline and createNewKey both take default value false.
 	m_SciMPT -> AddProperty("SCINTILLATIONCOMPONENT1", photonEnergy, scintil, false, true);
 	m_SciMPT -> AddConstProperty("SCINTILLATIONYIELD", 10000. / MeV);
-//	m_SciMPT -> AddConstProperty("SCINTILLATIONYIELD", 1. / MeV);
+//	m_SciMPT -> AddConstProperty("SCINTILLATIONYIELD", 1. / GeV);
 	m_SciMPT -> AddConstProperty("RESOLUTIONSCALE", .0);
 	m_SciMPT -> AddConstProperty("SCINTILLATIONTIMECONSTANT1", 2.1 * ns);
 	m_SciMPT -> AddConstProperty("SCINTILLATIONRISETIME1"    , 0.9 * ns);

@@ -42,7 +42,7 @@ void SteAct::UserSteppingAction(const G4Step* step)
 
 	// Who am I? Where am I? What am I undergoing?
 	// // Track ID
-//	G4int trackID = step -> GetTrack() -> GetTrackID();
+	G4int trackID = step -> GetTrack() -> GetTrackID();
 	// // Particle definition
 //	G4ParticleDefinition* par = step -> GetTrack() -> GetDefinition();
 	// // Particle name
@@ -77,6 +77,7 @@ void SteAct::UserSteppingAction(const G4Step* step)
 	// // Time
 //	G4double preGTim e = step -> GetPreStepPoint()  -> GetGlobalTime();
 	G4double postGTime = step -> GetPostStepPoint() -> GetGlobalTime();
+
 
 	//------------------------------------------------
 	// The optical photon has reached the PMT1!

@@ -3,8 +3,7 @@ void Plot()
 	//------------------------------------------------
 	// Open result
 	//------------------------------------------------
-//	TFile* file = new TFile("dual_module_2024-11-12_21-33-25.root");
-	TFile* file = new TFile("dual_module_2024-11-13_09-19-21.root");
+	TFile* file = new TFile("dual_module_2024-11-13_15-01-57.root");
 	TTree* tree = (TTree*) file -> Get("dual_module");
 	int proc = 0;
 	int mod = 0;

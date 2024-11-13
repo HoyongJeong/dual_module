@@ -69,6 +69,8 @@ class DetCon: public G4VUserDetectorConstruction
 	G4VPhysicalVolume* m_LabPV;
 
 
+	G4OpticalSurface* m_SciOpS;
+
 	//------------------------------------------------
 	// Module1
 	//------------------------------------------------
@@ -85,7 +87,6 @@ class DetCon: public G4VUserDetectorConstruction
 	G4VPhysicalVolume* m_PMT1PV;
 
 	// Surface objects: Scint1
-	G4OpticalSurface* m_Sci1OpS;
 	G4LogicalBorderSurface* m_Sci1LBS;
 
 
@@ -105,12 +106,7 @@ class DetCon: public G4VUserDetectorConstruction
 	G4VPhysicalVolume* m_PMT2PV;
 
 	// Surface objects: Scint2
-	G4OpticalSurface* m_Sci2OpS;
 	G4LogicalBorderSurface* m_Sci2LBS;
-
-
-	// Surface objects: Air
-	G4OpticalSurface* m_AirOpS;
 };
 
 #endif
